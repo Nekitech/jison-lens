@@ -1,7 +1,11 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from 'tailwindcss';
+
 export default {
-    darkMode: ['class'],
-    content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+    content: [
+        './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/**/*.{js,ts,jsx,tsx,mdx}',
+    ],
     theme: {
         extend: {
             borderRadius: {
@@ -10,6 +14,9 @@ export default {
                 sm: 'calc(var(--radius) - 4px)',
             },
             colors: {
+                'primary-black': 'var(--primary-black)',
+                'primary-text': 'var(--primary-text)',
+
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
                 card: {
@@ -54,4 +61,4 @@ export default {
         },
     },
     plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar')],
-};
+} satisfies Config;

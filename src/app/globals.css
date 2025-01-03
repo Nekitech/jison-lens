@@ -6,12 +6,19 @@
     box-sizing: border-box;
 }
 
+
+:root {
+
+      width: 100%;
+    --primary-black: #282c34;
+    --primary-text: #fff;
+}
+
+
 body {
-    overflow-x: hidden;
+  overflow: hidden;
 }
-#root {
-    width: 100%;
-}
+
 
 @layer base {
     :root {
