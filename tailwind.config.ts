@@ -16,6 +16,8 @@ export default {
             colors: {
                 'primary-black': 'var(--primary-black)',
                 'primary-text': 'var(--primary-text)',
+                'secondary-black': 'var(--secondary-black)',
+                'primary-blue': 'var(--primary-blue)',
 
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',

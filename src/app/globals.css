@@ -8,10 +8,11 @@
 
 
 :root {
-
       width: 100%;
     --primary-black: #282c34;
+    --secondary-black: #1b1d23;
     --primary-text: #fff;
+    --primary-blue: #00ffff26
 }
 
 

@@ -1,12 +1,13 @@
 'use client';
-import GrammarEditor from '@/widgets/GrammarEditor';
 import RightPane from '@/widgets/RightPane';
 import SplitPane from '@/shared/ui/SplitPane/split_pane';
+import LeftPane from '@/widgets/LeftPane';
+import React from 'react';
 
 export default function Home() {
     return (
         <>
-            <SplitPane left={<GrammarEditor />} right={<RightPane />} />
+            <SplitPane left={<LeftPane />} right={<RightPane />} />
         </>
     );
 }

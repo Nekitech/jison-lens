@@ -1,1 +1,1 @@
-export {default} from './right_pane.tsx'
+export { default } from './right_pane';
