@@ -13,63 +13,110 @@ import ParsingData from '@/shared/actions/parsingData';
 import { toast } from '@/shared/hooks/use-toast';
 import { Toaster } from '@/shared/ui/toaster';
 import createParser from '@/shared/actions/createParser';
+import DownloadParser from '@/features/downloadParser/download_parser';
+import DownloadGrammar from '@/features/downloadGrammar/download_grammar';
+import { Separator } from '@/shared/ui/separator';
+import { ArrowUpDown, Hammer } from 'lucide-react';
+import {
+    Menubar,
+    MenubarContent,
+    MenubarGroup,
+    MenubarItem,
+    MenubarMenu,
+    MenubarSeparator,
+    MenubarTrigger,
+} from '@/shared/ui/menubar';
+import DownloadTSParser from '@/features/downloadTSParser/download_ts_parser';
 
 const LeftPane = () => {
     const [text, setText] = useState('');
     const { setData } = useParsingDataContext();
     const parsingDataAction = ParsingData.bind(null, text);
+
+    const onCreateParser = async () => {
+        createParser()
+            .then((res) => {
+                if (!res.success) {
+                    throw new Error(res.message);
+                }
+                const { success, message } = res;
+                if (success) {
+                    toast({
+                        title: 'Success',
+                        description: message,
+                        variant: 'default',
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error',
+                    description: err.message,
+                    variant: 'destructive',
+                });
+            });
+    };
+
+    const onParsing = async () => {
+        const { err, value, ast_tree } = await parsingDataAction();
+        if (!err) {
+            setData({
+                resultedValue: value,
+                tree: ast_tree,
+            });
+        } else {
+            toast({
+                title: `Error parsing -  ${err.name}`,
+                description: err.message,
+                variant: 'destructive',
+            });
+        }
+    };
     return (
         <>
-            <div
-                className={
-                    'flex items-center justify-end w-full h-16 bg-primary-black p-4 gap-x-4'
-                }
-            >
-                <Button
-                    variant={'default'}
-                    onClick={async () => {
-                        const { success, message, stderr } =
-                            await createParser();
-                        if (success) {
-                            toast({
-                                title: 'Parser created',
-                                description: message,
-                                variant: 'default',
-                            });
-                        } else {
-                            toast({
-                                title: 'Error',
-                                description: stderr,
-                                variant: 'destructive',
-                            });
-                        }
-                    }}
-                >
-                    Generate parser
-                </Button>
-                <Button
-                    variant={'secondary'}
-                    onClick={async () => {
-                        const { err, value, ast_tree } =
-                            await parsingDataAction();
-                        if (!err) {
-                            setData({
-                                resultedValue: value,
-                                tree: ast_tree,
-                            });
-                        } else {
-                            toast({
-                                title: `Error parsing -  ${err.name}`,
-                                description: err.message,
-                                variant: 'destructive',
-                            });
-                        }
-                    }}
-                >
-                    Parsing
-                </Button>
-            </div>
+            <Toaster />
             <ResizablePanelGroup direction="vertical" className="w-full">
+                <div
+                    className={
+                        'flex items-center justify-end w-full h-16 bg-primary-black p-4 gap-x-4'
+                    }
+                >
+                    <Menubar>
+                        <MenubarMenu>
+                            <MenubarTrigger className={'cursor-pointer'}>
+                                Download / Upload
+                            </MenubarTrigger>
+                            <MenubarContent>
+                                <MenubarGroup>
+                                    <MenubarItem>
+                                        <DownloadParser />
+                                    </MenubarItem>
+                                    <MenubarItem>
+                                        <DownloadTSParser />
+                                    </MenubarItem>
+                                </MenubarGroup>
+                                <MenubarSeparator
+                                    className={'bg-primary-black'}
+                                />
+
+                                <MenubarItem>
+                                    <DownloadGrammar />
+                                </MenubarItem>
+                            </MenubarContent>
+                        </MenubarMenu>
+                    </Menubar>
+
+                    <Separator orientation={'vertical'} />
+                    <Button variant={'default'} onClick={onCreateParser}>
+                        <Hammer />
+                        Generate parser
+                    </Button>
+                    <Button variant={'secondary'} onClick={onParsing}>
+                        <ArrowUpDown />
+                        Parsing
+                    </Button>
+                </div>
                 <ResizablePanel defaultSize={70}>
                     <GrammarEditor />
                 </ResizablePanel>
@@ -78,9 +125,8 @@ const LeftPane = () => {
                     style={{
                         backgroundColor: '#1e1e1e',
                         boxShadow: '0 4px 10px rgba(0, 255, 255, 0.7)',
-                        width: 6,
+                        width: '100%',
                     }}
-                    className={'shadow-[0_6px_8px_rgba(0,255,255,0.15)]'}
                 />
                 <ResizablePanel
                     defaultSize={30}
@@ -97,7 +143,6 @@ const LeftPane = () => {
                     />
                 </ResizablePanel>
             </ResizablePanelGroup>
-            <Toaster />
         </>
     );
 };

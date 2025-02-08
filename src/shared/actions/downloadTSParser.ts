@@ -1,15 +1,14 @@
 'use server';
 
-import { promisify } from 'node:util';
-import { exec } from 'node:child_process';
-import { readFileSync } from 'node:fs';
-import * as acorn from 'acorn';
 import { readFile } from 'node:fs/promises';
 import checkErrorGrammar from '@/shared/actions/checkErrorGrammar';
+import { promisify } from 'node:util';
+import { exec } from 'node:child_process';
+import downloadFile from '@/shared/actions/downloadFile';
 
 const execPromise = promisify(exec);
 
-export default async function createParser() {
+export default async function downloadTSParser(filename: string) {
     try {
         const grammar = await readFile(
             'src/shared/generated/grammar.jison',
@@ -19,21 +18,13 @@ export default async function createParser() {
         if (!validateGrammar.success) {
             throw new Error(validateGrammar.message);
         }
-        const type_parser = 'lalr';
-        const command = `npx jison grammar.jison -p ${type_parser}`;
+        const command = `npx ts-jison -t typescript -n TsCalc -n TsCalc -o ${filename} grammar.jison`;
         const cwd = 'src/shared/generated';
         await execPromise(command, {
             cwd,
         });
 
-        const generatedCode = readFileSync(`${cwd}/grammar.js`, 'utf-8');
-        acorn.parse(generatedCode, { ecmaVersion: 'latest' });
-
-        console.log('Parser generate');
-        return {
-            success: true,
-            message: 'Парсер был успешно создан!',
-        };
+        return await downloadFile(`${cwd}/${filename}`);
     } catch (e: any) {
         console.log(e);
         return {

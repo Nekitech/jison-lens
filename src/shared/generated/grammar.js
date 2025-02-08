@@ -434,7 +434,7 @@ parse: function parse(input) {
 
   var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-
+            
 // src/constants/index.ts
 var ReservedList = ["end note, +INITIAL"];
 var SpecialCharList = [
@@ -447,7 +447,7 @@ var SpecialCharList = [
   "&",
   "*",
   '"',
-  "\u2116",
+  "№",
   "(",
   ")",
   "[",

@@ -54,7 +54,6 @@ export default async function buildLexTree(data: LexNodeType | null) {
         }
     }
 
-    // Рекурсивная функция для расчета координат и добавления узлов и связей
     const recursive = (
         node: LexNodeType | null,
         coords: { x: number; y: number },
@@ -90,16 +89,21 @@ export default async function buildLexTree(data: LexNodeType | null) {
                 position: newCoords,
                 draggable: false,
                 connectable: false,
+                style: {
+                    width: 'auto',
+                    minWidth: 80,
+                    padding: '4px 8px 4px 8px',
+                    borderRadius: '5px',
+                    whiteSpace: 'nowrap',
+                },
             });
 
-            // Добавляем связь
             edges.push({
                 id: `${node?.id} -> ${nextNode?.id}`,
                 source: node?.id,
                 target: nextNode?.id,
             });
 
-            // Рекурсивно обрабатываем дочерние узлы
             recursive(nextNode, newCoords, level + 1);
 
             // Сдвигаем позицию для следующего дочернего узла
@@ -107,10 +111,8 @@ export default async function buildLexTree(data: LexNodeType | null) {
         }
     };
 
-    // Добавляем уникальные id всем узлам
     addUniqueIds(data);
 
-    // корневой узел
     const root = {
         id: data?.id,
         data: {
@@ -121,6 +123,8 @@ export default async function buildLexTree(data: LexNodeType | null) {
             x: 0,
             y: 0,
         },
+        draggable: false,
+        connectable: false,
     };
     nodes.push(root);
 

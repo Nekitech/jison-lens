@@ -11,6 +11,9 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import { Connection } from '@xyflow/system';
 import { EdgeBase } from '@xyflow/system/dist/esm/types/edges';
 import { NodeBase } from '@xyflow/system/dist/esm/types/nodes';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { Label } from '@/shared/ui/label';
+import { ScrollArea } from '@/shared/ui/scroll-area';
 
 type TAstVisualizerProps = {
     initEdges: EdgeBase[];
@@ -38,55 +41,67 @@ const AstVisualizer: FC<TAstVisualizerProps> = ({ initNodes, initEdges }) => {
     );
     const handleNodeClick = (event, node) => {
         setOpen(true);
-        setSelectedNode(node); // Сохраняем выбранную ноду в состоянии
+        setSelectedNode(node);
     };
+
     return (
-        <ReactFlow
-            colorMode={'dark'}
-            zoomOnScroll={true}
-            nodes={nodes}
-            edges={edges}
-            onNodeClick={handleNodeClick}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            fitView={true}
-        >
-            {open && selectedNode && (
-                <div
-                    className={
-                        'h-auto absolute top-0.5 right-[50%] bg-primary-blue text-primary-text p-4 rounded z-10'
-                    }
-                >
-                    <button
-                        className={' absolute top-2 right-2'}
-                        onClick={() => setOpen(false)}
+        <>
+            <ReactFlow
+                colorMode={'dark'}
+                zoomOnScroll={true}
+                nodes={nodes}
+                edges={edges}
+                onNodeClick={handleNodeClick}
+                onNodesChange={onNodesChange}
+                onClickCapture={() => setOpen(false)}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                fitView={true}
+                className={'relative'}
+            >
+                <Popover open={open}>
+                    <PopoverTrigger asChild>
+                        <div></div>
+                    </PopoverTrigger>
+                    <PopoverContent
+                        side={'left'}
+                        className="min-w-[200px] w-auto bg-primary-black text-primary-text absolute"
                     >
-                        [X]
-                    </button>
-                    <h3>lex = {selectedNode.data.label}</h3>
-                    <pre>
-                        <code>
-                            {JSON.stringify(
-                                selectedNode.data.description,
-                                null,
-                                2,
-                            )}
-                        </code>
-                    </pre>
-                </div>
-            )}
-            <Background
-                variant={BackgroundVariant.Dots}
-                bgColor={'var(--primary-black)'}
-            />
-            <Controls
-                className={'flex flex-col gap-y-2'}
-                showInteractive={true}
-                showZoom={true}
-                position={'top-right'}
-            />
-        </ReactFlow>
+                        {selectedNode && (
+                            <ScrollArea
+                                className={
+                                    'flex flex-col gap-y-4 max-h-[700px] h-auto px-2'
+                                }
+                            >
+                                <Label>
+                                    Lex name - {selectedNode.data.label}
+                                </Label>
+                                <Label>Value node: </Label>
+                                <pre>
+                                    <code>
+                                        {JSON.stringify(
+                                            selectedNode.data.description,
+                                            null,
+                                            2,
+                                        )}
+                                    </code>
+                                </pre>
+                            </ScrollArea>
+                        )}
+                    </PopoverContent>
+                </Popover>
+                <Background
+                    variant={BackgroundVariant.Dots}
+                    bgColor={'var(--primary-black)'}
+                />
+                <Controls
+                    className={'flex flex-col gap-y-2'}
+                    showInteractive={true}
+                    showZoom={true}
+                    position={'top-right'}
+                />
+            </ReactFlow>
+        </>
     );
 };
 

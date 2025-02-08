@@ -5,12 +5,13 @@ import { useParsingDataContext } from '@/shared/context/parsingDataContext';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/legacy-modes/mode/javascript';
 import { StreamLanguage } from '@codemirror/language';
+import { Share2 } from 'lucide-react';
 
 const RightPane = () => {
     const { data } = useParsingDataContext();
     return (
         <Tabs
-            defaultValue={'input_parser'}
+            defaultValue={'ast'}
             className="w-full bg-primary-black h-[100vh]"
         >
             <TabsList
@@ -26,8 +27,10 @@ const RightPane = () => {
                                  shadow-[0_6px_8px_rgba(0,255,255,0.15)] 
                                  border-solid`}
             >
-                <TabsTrigger value="input_parser">Парсинг данных</TabsTrigger>
-                <TabsTrigger value="ast">AST</TabsTrigger>
+                <TabsTrigger value="ast" className={'flex gap-x-2'}>
+                    <Share2 /> AST
+                </TabsTrigger>
+                <TabsTrigger value="input_parser">Вывод парсера</TabsTrigger>
             </TabsList>
 
             <TabsContent value="ast">

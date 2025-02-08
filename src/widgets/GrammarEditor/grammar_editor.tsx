@@ -4,18 +4,32 @@ import { StreamLanguage } from '@codemirror/language';
 import { useCallback, useState } from 'react';
 import { testGrammar } from '@/shared/examples/testGrammar';
 import updateGrammar from '@/shared/actions/updateGrammar';
+import { toast } from '@/shared/hooks/use-toast';
 
 const GrammarEditor = () => {
     const [grammar, setGrammar] = useState(testGrammar);
     const handleChangeGrammar = useCallback(async (value: string) => {
         setGrammar(value);
-        const updateGrammarWithArgs = updateGrammar.bind(null, value);
-        await updateGrammarWithArgs();
+        try {
+            await updateGrammar
+                .bind(null, value)()
+                .then((res) => {
+                    if (!res.success) {
+                        throw new Error(res.message);
+                    }
+                });
+        } catch (err) {
+            toast({
+                title: 'Error',
+                description: err.message,
+                variant: 'destructive',
+            });
+        }
     }, []);
     return (
         <ReactCodeMirror
             className={
-                'scrollbar-thin scrollbar-thumb-primary-blue scrollbar-track-gray-300 overflow-y-scroll h-full'
+                'scrollbar-thin scrollbar-thumb-primary-black scrollbar-track-gray-300 overflow-y-scroll h-full'
             }
             extensions={[StreamLanguage.define(ebnf)]}
             value={grammar}

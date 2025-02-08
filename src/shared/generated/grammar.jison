@@ -1,7 +1,7 @@
 %{
   var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-
+            
 // src/constants/index.ts
 var ReservedList = ["end note, +INITIAL"];
 var SpecialCharList = [
@@ -14,7 +14,7 @@ var SpecialCharList = [
   "&",
   "*",
   '"',
-  "\u2116",
+  "№",
   "(",
   ")",
   "[",
@@ -290,3 +290,4 @@ NUMBER
         {$$ = { NumberDeclaration: Number($1), expressionType: ExpressionTypes.IntegerDeclaration} }
         | DECIMAL
         {$$ = { NumberDeclaration: Number($1), expressionType:ExpressionTypes.DecimalDeclaration} };
+

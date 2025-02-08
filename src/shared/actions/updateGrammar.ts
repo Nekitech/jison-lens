@@ -2,6 +2,7 @@
 
 import path from 'node:path';
 import * as fs from 'node:fs';
+import checkErrorGrammar from '@/shared/actions/checkErrorGrammar';
 
 export default async function updateGrammar(grammar: string) {
     try {
@@ -13,6 +14,10 @@ export default async function updateGrammar(grammar: string) {
             'grammar.jison',
         );
         fs.writeFileSync(filePath, grammar, 'utf8');
+        const validateGrammar = await checkErrorGrammar(grammar);
+        if (!validateGrammar.success) {
+            throw new Error(validateGrammar.message);
+        }
 
         return { success: true, message: 'Grammar saved successfully.' };
     } catch (error) {

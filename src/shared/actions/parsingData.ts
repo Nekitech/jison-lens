@@ -5,7 +5,7 @@ import buildLexTree from '@/shared/actions/buildLexTree';
 
 export default async function parsingData(text: string = '') {
     try {
-        const { parse, parser } = await import('../../../grammar');
+        const { parse, parser } = await import('@/shared/generated/grammar');
 
         const value = parse(text);
         const raw_data = await createNodesLexStructure(parser?.parserDebugger);
