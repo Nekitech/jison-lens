@@ -9,13 +9,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default async function updateGrammar(grammar: string) {
   try {
-    console.log(__dirname)
     const filePath = path.join(
       __dirname,
       '..',
       'generated',
       'grammar.jison',
     );
+    console.log(__dirname, process.cwd(), filePath)
     fs.writeFileSync(filePath, grammar, 'utf8');
     const validateGrammar = await checkErrorGrammar(grammar);
     if (!validateGrammar.success) {
