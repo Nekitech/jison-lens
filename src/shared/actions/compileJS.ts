@@ -32,7 +32,11 @@ function getGrammarHash(grammar: string): string {
 
 export default async function executeParsingVM(value: string) {
   try {
-    const path_grammar = path.resolve(process.cwd(), 'src', 'shared', 'generated', 'grammar.jison');
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    const path_grammar = isProduction
+      ? '/tmp/grammar.jison'
+      : path.resolve(process.cwd(), 'src', 'shared', 'generated', 'grammar.jison');
     const compiledGrammar = readFileSync(path_grammar, {
       encoding: 'utf8'
     })
