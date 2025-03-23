@@ -1,4 +1,5 @@
 export const testGrammar = `
+
 /* Calculator demo -
  * Parses and executes mathematical expressions.
  * Written by Zach Carter. Annotated by Nolan Lawson.
@@ -7,9 +8,9 @@ export const testGrammar = `
 /* lexical grammar */
 %lex
 %%
-
-\s+                   /* skip whitespace */
-[0-9]+("."[0-9]+)?\b  return 'NUMBER'
+ 
+\\s+                   /* skip whitespace */
+[0-9]+("."[0-9]+)?\\b  return 'NUMBER'
 "*"                   return '*'
 "/"                   return '/'
 "-"                   return '-'
@@ -92,4 +93,5 @@ e
     | PI
         {$$ = Math.PI;}
     ;
+
 `;
