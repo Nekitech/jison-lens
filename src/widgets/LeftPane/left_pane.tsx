@@ -65,7 +65,9 @@ const LeftPane = () => {
   // };
 
   useEffect(() => {
-    downloadFile(`src/shared/grammars/${selected_grammar}`).then(grammar => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const path = isProduction ? '/tmp/' : 'src/shared/grammars/';
+    downloadFile(`${path}${selected_grammar}`).then(grammar => {
       setGrammar(grammar)
     }).catch(err => console.log(err))
   }, [selected_grammar])

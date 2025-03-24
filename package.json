@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "check-types": "tsc --noEmit",
-    "format": "pnpm exec prettier . --write"
+    "format": "pnpm exec prettier . --write",
+    "build:prod": "NODE_ENV=production && next build && chmod +x ./sh/copy_grammar.sh && ./sh/copy_grammar.sh"
   },
   "dependencies": {
     "@codemirror/language": "^6.10.8",
