@@ -8,3 +8,5 @@ function copy_grammar() {
     console.log('Папка успешно скопирована!');
   });
 }
+
+copy_grammar()
