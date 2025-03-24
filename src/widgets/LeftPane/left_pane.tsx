@@ -9,14 +9,10 @@ import {
 } from '@/shared/ui/resizable';
 import { Textarea } from '@/shared/ui/textarea';
 import { useParsingDataContext } from '@/shared/context/parsingDataContext';
-import ParsingData from '@/shared/actions/parsingData';
 import { toast } from '@/shared/hooks/use-toast';
 import { Toaster } from '@/shared/ui/toaster';
-import createParser from '@/shared/actions/createParser';
-import DownloadParser from '@/features/downloadParser/download_parser';
-import DownloadGrammar from '@/features/downloadGrammar/download_grammar';
 import { Separator } from '@/shared/ui/separator';
-import { ArrowUpDown, Hammer } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 import {
   Menubar,
   MenubarContent,
@@ -29,8 +25,8 @@ import {
 import DownloadTSParser from '@/features/downloadTSParser/download_ts_parser';
 import executeParsingVM from '@/shared/actions/compileJS';
 import CustomSelectGrammar from '@/features/selectGrammar/custom_select_grammar';
-import downloadFile from '@/shared/actions/downloadFile';
 import { grammars } from '@/shared/utils/grammar';
+import downloadGrammar from '@/shared/actions/downloadGrammar';
 
 const LeftPane = () => {
   const [text, setText] = useState('');
@@ -65,9 +61,7 @@ const LeftPane = () => {
   // };
 
   useEffect(() => {
-    const isProduction = process.env.NODE_ENV === 'production';
-    const path = isProduction ? '/tmp/' : 'src/shared/grammars/';
-    downloadFile(`${path}${selected_grammar}`).then(grammar => {
+    downloadGrammar(selected_grammar).then(grammar => {
       setGrammar(grammar)
     }).catch(err => console.log(err))
   }, [selected_grammar])
