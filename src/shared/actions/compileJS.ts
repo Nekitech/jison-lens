@@ -30,20 +30,12 @@ function getGrammarHash(grammar: string): string {
 }
 
 
-export default async function executeParsingVM(value: string) {
+export default async function executeParsingVM(value: string, grammar: string) {
   try {
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    const path_grammar = isProduction
-      ? '/tmp/grammar.jison'
-      : path.resolve(process.cwd(), 'src', 'shared', 'generated', 'grammar.jison');
-    const compiledGrammar = readFileSync(path_grammar, {
-      encoding: 'utf8'
-    })
-    const currentGrammarHash = getGrammarHash(compiledGrammar);
+    const currentGrammarHash = getGrammarHash(grammar);
 
     if (cachedGrammarHash !== currentGrammarHash || !cachedParser) {
-      cachedParser = new Jison.Parser(compiledGrammar).generate();
+      cachedParser = new Jison.Parser(grammar).generate();
       cachedGrammarHash = currentGrammarHash;
       console.log('New parser cached')
     }

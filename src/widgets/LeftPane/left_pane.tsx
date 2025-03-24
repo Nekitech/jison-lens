@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import GrammarEditor from '@/widgets/GrammarEditor';
 import { Button } from '@/shared/ui/button';
 import {
@@ -28,11 +28,16 @@ import {
 } from '@/shared/ui/menubar';
 import DownloadTSParser from '@/features/downloadTSParser/download_ts_parser';
 import executeParsingVM from '@/shared/actions/compileJS';
+import CustomSelectGrammar from '@/features/selectGrammar/custom_select_grammar';
+import downloadFile from '@/shared/actions/downloadFile';
+import { grammars } from '@/shared/utils/grammar';
 
 const LeftPane = () => {
   const [text, setText] = useState('');
   const { setData } = useParsingDataContext();
-  const parsingDataAction = executeParsingVM.bind(null, text)
+  const [selected_grammar, setSelectGrammar] = useState(() => grammars[0].name_file)
+  const [grammar, setGrammar] = useState('')
+  const parsingDataAction = executeParsingVM.bind(null, text, grammar)
 
   // const onCreateParser = async () => {
   //   createParser()
@@ -59,6 +64,11 @@ const LeftPane = () => {
   //     });
   // };
 
+  useEffect(() => {
+    downloadFile(`src/shared/grammars/${selected_grammar}`).then(grammar => {
+      setGrammar(grammar)
+    }).catch(err => console.log(err))
+  }, [selected_grammar])
   const onParsing = async () => {
     const { err, value, ast_tree } = await parsingDataAction();
     if (!err) {
@@ -83,6 +93,7 @@ const LeftPane = () => {
             'flex items-center justify-end w-full h-16 bg-primary-black p-4 gap-x-4'
           }
         >
+          <CustomSelectGrammar setSelectGrammar={setSelectGrammar} />
           <Menubar>
             <MenubarMenu>
               <MenubarTrigger className={'cursor-pointer'}>
@@ -91,7 +102,7 @@ const LeftPane = () => {
               <MenubarContent>
                 <MenubarGroup>
                   <MenubarItem>
-                    <DownloadParser />
+                    {/* <DownloadParser /> */}
                   </MenubarItem>
                   <MenubarItem>
                     <DownloadTSParser />
@@ -102,7 +113,7 @@ const LeftPane = () => {
                 />
 
                 <MenubarItem>
-                  <DownloadGrammar />
+                  {/* <DownloadGrammar /> */}
                 </MenubarItem>
               </MenubarContent>
             </MenubarMenu>
@@ -119,7 +130,7 @@ const LeftPane = () => {
           </Button>
         </div>
         <ResizablePanel defaultSize={70}>
-          <GrammarEditor />
+          <GrammarEditor setGrammar={setGrammar} selected_grammar={grammar} />
         </ResizablePanel>
         <ResizableHandle
           withHandle

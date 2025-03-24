@@ -1,94 +1,369 @@
-
-/* Calculator demo -
- * Parses and executes mathematical expressions.
- * Written by Zach Carter. Annotated by Nolan Lawson.
- */
-
-/* lexical grammar */
-%lex
-%%
+%{
+  var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
  
-\s+                   /* skip whitespace */
-[0-9]+("."[0-9]+)?\b  return 'NUMBER'
-"*"                   return '*'
-"/"                   return '/'
-"-"                   return '-'
-"+"                   return '+'
-"^"                   return '^'
-"("                   return '('
-")"                   return ')'
-"PI"                  return 'PI'
-"E"                   return 'E'
-// EOF means "end of file"
-<<EOF>>               return 'EOF'
-// any other characters will throw an error
-.                     return 'INVALID'
+// src/constants/index.ts
+var ReservedList = ["end note, +INITIAL"];
+var SpecialCharList = [
+  "!",
+  "@",
+  "$",
+  // Нужны двойные кавычки, т.к при одинарных некорректно импортируется в грамматику
+  "%",
+  "^",
+  "&",
+  "*",
+  '"',
+  "\u2116",
+  "(",
+  ")",
+  "[",
+  "]",
+  "{",
+  "}",
+  "+",
+  "-",
+  "=",
+  ";",
+  ":",
+  "?",
+  ".",
+  ",",
+  "/",
+  "\\",
+  "|"
+];
+var ExpressionTypes = {
+  Function: "function",
+  StringDeclaration: "string",
+  ArrayDeclaration: "array",
+  IntegerDeclaration: "integer",
+  DecimalDeclaration: "decimal",
+  FunctionProperty: "FunctionProperty",
+  Constant: "constant",
+  Payload: "payload",
+  Context: "context",
+  Identifier: "identifier"
+};
+var maxNestedFuncLevel = 8;
+
+// src/grammar/jsGrammar.ts
+var calcDepthFunc = recursiveDepth();
+function recursiveDepth() {
+  let counterDepth = 1;
+  return (funcObj) => {
+    const args = funcObj.FunctionDeclaration.Arguments;
+    const funcArgs = args.filter((item) => "FunctionDeclaration" in item);
+    if (args.length === 0 || funcArgs.length === 0) {
+      return 1;
+    } else {
+      const arrArgs = [];
+      for (const func of funcArgs) {
+        arrArgs.push(calcDepthFunc(func));
+      }
+      counterDepth = Math.max(...arrArgs) + 1;
+      return counterDepth;
+    }
+  };
+}
+__name(recursiveDepth, "recursiveDepth");
+ {
+  ExpressionTypes,
+  ReservedList,
+  SpecialCharList,
+  calcDepthFunc,
+  maxNestedFuncLevel
+};
+//# sourceMappingURL=jsGrammar.js.map
+  var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+
+// src/constants/index.ts
+var ReservedList = ["end note, +INITIAL"];
+var SpecialCharList = [
+  "!",
+  "@",
+  "$",
+  // Нужны двойные кавычки, т.к при одинарных некорректно импортируется в грамматику
+  "%",
+  "^",
+  "&",
+  "*",
+  '"',
+  "\u2116",
+  "(",
+  ")",
+  "[",
+  "]",
+  "{",
+  "}",
+  "+",
+  "-",
+  "=",
+  ";",
+  ":",
+  "?",
+  ".",
+  ",",
+  "/",
+  "\\",
+  "|"
+];
+var ExpressionTypes = {
+  Function: "function",
+  StringDeclaration: "string",
+  ArrayDeclaration: "array",
+  IntegerDeclaration: "integer",
+  DecimalDeclaration: "decimal",
+  FunctionProperty: "FunctionProperty",
+  Constant: "constant",
+  Payload: "payload",
+  Context: "context",
+  Identifier: "identifier"
+};
+var maxNestedFuncLevel = 8;
+
+// src/grammar/jsGrammar.ts
+var calcDepthFunc = recursiveDepth();
+function recursiveDepth() {
+  let counterDepth = 1;
+  return (funcObj) => {
+    const args = funcObj.FunctionDeclaration.Arguments;
+    const funcArgs = args.filter((item) => "FunctionDeclaration" in item);
+    if (args.length === 0 || funcArgs.length === 0) {
+      return 1;
+    } else {
+      const arrArgs = [];
+      for (const func of funcArgs) {
+        arrArgs.push(calcDepthFunc(func));
+      }
+      counterDepth = Math.max(...arrArgs) + 1;
+      return counterDepth;
+    }
+  };
+}
+__name(recursiveDepth, "recursiveDepth");
+ {
+  ExpressionTypes,
+  ReservedList,
+  SpecialCharList,
+  calcDepthFunc,
+  maxNestedFuncLevel
+};
+//# sourceMappingURL=jsGrammar.js.map
+
+  let counter = 0;
+%}
+
+%lex
+
+%options case-insensitive
+
+%%
+
+<<EOF>>                              return 'EOF';
+[\r\n]+                              return 'NewLine';
+'%%'                                 return 'CONSTANT_SYMBOL';
+[\s]+                                /* skip all whitespace */
+[A-Za-z]{1,}[A-Za-z0-9\.]*(?=[(])    return 'FUNCTION_NAME';
+'subscribe/'                         return 'SUBSCRIBE'
+'emit/'                              return 'EMIT'
+'define/'                            return 'DEFINE'
+'Init'                               return 'INITIAL_STATE'
+'ByPass'                             return 'BY_PASS'
+
+[a-zA-Z]\w{0,254}                     return 'IDENT'
+'+'                                  return 'PLUS'
+'{'                                  return 'LEFT_BRACE'
+'}'                                  return 'RIGHT_BRACE'
+'#'                                  return 'CONTEXT_SYMBOL'
+'$'                                  return 'DOLLAR_SYMBOL'
+','                                  return 'COMMA'
+'('                                  return 'LEFT_BRACKET'
+'<='                                 return 'LEFT_ARROW'
+'=>'                                 return 'RIGHT_ARROW'
+'='                                  return 'ASSIGN'
+')'                                  return 'RIGHT_BRACKET'
+'/'                                  return 'FORWARD_SLASH'
+'?'                                  return 'QUESTION_MARK'
+\'[^']+\'                            yytext = yytext.slice(1,-1); return 'STRING'
+\"[^"]+\"                            yytext = yytext.slice(1,-1); return 'STRING'
+'-'?[0-9]+'.'[0-9]+                  return 'DECIMAL'
+'-'?[0-9]+                           return 'INTEGER'
+
+'[]'                                 return 'ARRAY'
+
+
 
 /lex
 
-// Operator associations and precedence.
-//
-// This is the part that defines rules like
-// e.g. multiplication/division apply before
-// subtraction/addition, etc. Of course you can
-// also be explicit by adding parentheses, as
-// we all learned in elementary school.
-//
-// Notice that there's this weird UMINUS thing.
-// This is a special Bison/Jison trick for preferring
-// the unary interpretation of the minus sign, e.g.
-// -2^2 should be interpreted as (-2)^2 and not -(2^2).
-//
-// Details here:
-// http://web.mit.edu/gnu/doc/html/bison_8.html#SEC76
 
-%left '+' '-'
-%left '*' '/'
-%left '^'
-%left UMINUS
 
-%start expressions
+
+%start start
 
 %% /* language grammar */
 
-// At the top level, you explicitly return
-// the result. $1 refers to the first child node,
-// i.e. the "e"
+/* $$ is the value of the symbol being evaluated (= what is to the left of the : in the rule */
+start
+        : document 'EOF' {return $1};
 
-expressions
-    : e EOF
-        {return $1;}
-    ;
+document
+        : /* empty */ {$$={defines:[], contextDescription:[],emit:[],subscribe:[],initialState:false,byPass:false}}
+        | document line {
+           if($2 !== '\n') {
+              if($2.hasOwnProperty('initialState')){
+                $1['initialState'] = true
+              }
+              if($2.hasOwnProperty('byPass')){
+                $1['byPass'] = true
+              }
+              if($2.hasOwnProperty('context'))  $1['contextDescription'].push($2)
+              if($2.hasOwnProperty('emit')) $1['emit'].push($2['emit'])
+              if($2.hasOwnProperty('subscribe')) $1['subscribe'].push($2['subscribe'])
+              if($2.hasOwnProperty('define')) $1['defines'].push($2['define'])
+              if($2.hasOwnProperty('expression')) { $$ = $2 }
+           }
+        };
 
-// For everything below the top level, $$ refers to
-// the thing that should be returned. yytext refers
-// to the text of that node.
-//
-// This {$$ = ...} format is actually no
-// longer necessary, because Jison 0.3
-// introduced a -> shorthand. You can see the
-// shorthand illustrated in the other sample
-// grammars.
+line
+        : statements
+        | 'NewLine';
 
-e
-    : e '+' e
-        {$$ = $1+$3;}
-    | e '-' e
-        {$$ = $1-$3;}
-    | e '*' e
-        {$$ = $1*$3;}
-    | e '/' e
-        {$$ = $1/$3;}
-    | e '^' e
-        {$$ = Math.pow($1, $3);}
-    | '-' e %prec UMINUS
-        {$$ = -$2;}
-    | '(' e ')'
-        {$$ = $2;}
-    | NUMBER
-        {$$ = Number(yytext);}
-    | E
-        {$$ = Math.E;}
-    | PI
-        {$$ = Math.PI;}
-    ;
+statements
+        :  PLUS INITIAL_STATE  {$$ = {initialState:true}}
+        |  PLUS BY_PASS {$$ = {byPass:true}}
+        |  CONTEXT_STATEMENT
+        |  EMIT_STATEMENT
+        |  SUBSCRIBE_STATEMENT
+        |  DEFINE_STATEMENT {$$ = {define:$1}}
+        |  EXPRESSION_STATEMENT {$$ = {expression: $1}};
+
+CONTEXT_STATEMENT
+        : CONTEXT_SYMBOL LEFT_BRACE RAW_KEYLIST RIGHT_BRACE {$$ = {context:$3} }
+        | CONTEXT_SYMBOL LEFT_BRACE RAW_KEYLIST RIGHT_BRACE LEFT_ARROW KEY_LIST {
+                  if($6.length > $3.length) {
+                        throw new Error('The number of arguments must be equal to or less than the number of context arguments.')}; $$ = {context: $3, reducer:$6}};
+
+
+EMIT_STATEMENT
+        : EMIT_EVENT {$$ = {emit:{...$1}}}
+        | EMIT_EVENT KEY_LIST_STATEMENT { $$ = {emit:{...$1, meta:[...$2]}} }
+        | EMIT_EVENT KEY_LIST_STATEMENT LEFT_ARROW CONTEXT_SYMBOL LEFT_BRACE RAW_KEYLIST RIGHT_BRACE { $$ = {emit:{ ...$1, meta: $2, context:[...$6] }}};
+
+EMIT_EVENT 
+        : EMIT IDENT { $$ = {identifier:$2}};
+
+SUBSCRIBE_STATEMENT
+        : SUBSCRIBE_EVENT { $$ = {subscribe:$1}}
+        | SUBSCRIBE_EVENT KEY_LIST_STATEMENT  { $$ = {subscribe:{payload:$2,...$1}}}
+        | SUBSCRIBE_EVENT KEY_LIST_STATEMENT LEFT_ARROW KEY_LIST_STATEMENT  { $$ = {subscribe:{...$1,meta:$4, payload:$2}}};
+
+
+SUBSCRIBE_EVENT
+        : SUBSCRIBE IDENT IDENT { $$ = {identifier:$2, actionName:$3}};
+
+
+DEFINE_STATEMENT: DEFINE IDENT DEFINE_ARGUMENTS RIGHT_ARROW DEFINE_FUNCTION {$$ = {identifier:$2, ...$3, expression:$5}};
+
+DEFINE_FUNCTION
+        : FUNCTION_NAME LEFT_BRACKET DEFINE_FUNCTION_ARGUMENTS RIGHT_BRACKET
+        {$$ = { expressionType:ExpressionTypes.Function,FunctionDeclaration: { FunctionName:$1, Arguments:[...$3]} } }
+        | FUNCTION_NAME LEFT_BRACKET RIGHT_BRACKET
+        {$$ = { expressionType:ExpressionTypes.Function, FunctionDeclaration: { FunctionName:$1, Arguments:[] } } }
+        | DEFINE_FUNCTION_VALUE;
+
+DEFINE_FUNCTION_VALUE
+        : IMMUTABLE
+        | CONSTANT;
+
+DEFINE_FUNCTION_ARGUMENTS
+        :  EXPRESSION_DEFINE {$$ = [$1]}
+        |  DEFINE_FUNCTION_ARGUMENTS COMMA EXPRESSION_DEFINE { $$ = [...$1, $3] };
+
+EXPRESSION_DEFINE
+        : IMMUTABLE
+        | CONSTANT
+        | IDENT {$$ = {expressionType:ExpressionTypes.Identifier, identifier:$1}}
+        | FUNCTION_NAME LEFT_BRACKET DEFINE_FUNCTION_ARGUMENTS RIGHT_BRACKET
+        {$$ = { expressionType:ExpressionTypes.Function,FunctionDeclaration: { FunctionName:$1, Arguments:[...$3]} } }
+        | FUNCTION_NAME LEFT_BRACKET RIGHT_BRACKET
+        {$$ = { expressionType:ExpressionTypes.Function, FunctionDeclaration: { FunctionName:$1, Arguments:[] } } };
+
+DEFINE_ARGUMENTS
+               : LEFT_BRACKET RIGHT_BRACKET {$$ = {Arguments:[]}}
+               | LEFT_BRACKET DEFINE_ARGUMENTS_TYPES RIGHT_BRACKET {$$ = {Arguments:[...$2]}};
+
+DEFINE_ARGUMENTS_TYPES
+               : IDENT  {$$ = $1}
+               | DEFINE_ARGUMENTS_TYPES COMMA IDENT {$$ = [$1].concat($3)}; 
+
+EXPRESSION_STATEMENT
+        : ASSIGN EXPRESSION QUESTION_MARK {$$ = $2};
+
+KEY_LIST_STATEMENT
+        : LEFT_BRACKET KEY_LIST RIGHT_BRACKET { $$ = $2};
+
+KEY_LIST
+        : KEY_ITEM {$$ = [$1]}
+        | KEY_ITEM COMMA KEY_LIST {$$ = [$1].concat($3)};
+KEY_ITEM
+        : DATA_OBJECT {$$ = {keyItem:{...$1}}}
+        | IMMUTABLE {$$ = {keyItem:{expression:$1}}}
+        | FUNCTION {$$ = {keyItem:{expression:$1}}};
+
+RAW_KEYLIST
+        : RAW_KEYITEM {$$ = [$1]}
+        | RAW_KEYITEM COMMA RAW_KEYLIST {$$ =[$1].concat($3)};
+
+RAW_KEYITEM
+        : IDENT {$$ = {keyItem:{identifier:$1}}}
+        | IDENT ASSIGN EXPRESSION {$$ = {keyItem:{identifier: $1,  expression: $3}}};
+
+FUNCTION
+        : FUNCTION_NAME LEFT_BRACKET ARGUMENTS RIGHT_BRACKET
+        {$$ = { expressionType:ExpressionTypes.Function,FunctionDeclaration: { FunctionName:$1, Arguments:[...$3]} } }
+        | FUNCTION_NAME LEFT_BRACKET RIGHT_BRACKET
+        {$$ = { expressionType:ExpressionTypes.Function, FunctionDeclaration: { FunctionName:$1, Arguments:[] } } };
+
+ARGUMENTS
+        :  EXPRESSION {$$ = [$1]}
+        |  ARGUMENTS COMMA EXPRESSION { $$ = [...$1, $3] };
+
+DATA_OBJECT
+        : DATA_OBJECT_REFERENCE ASSIGN  EXPRESSION  { $$ = {...$1, expression:$3}}
+        | DATA_OBJECT_REFERENCE;
+
+EXPRESSION
+        : IMMUTABLE
+        | DATA_OBJECT
+        | FUNCTION {counter = Math.max(calcDepthFunc($1), counter);
+                if(counter > maxNestedFuncLevel) {
+                    counter = 0;
+                    throw new Error('nested limit');
+                }};
+
+DATA_OBJECT_REFERENCE
+        : CONSTANT
+        | PAYLOAD_REFERENCE
+        | CONTEXT_REFERENCE;
+
+CONSTANT
+        : CONSTANT_SYMBOL IDENT {$$ = {expressionType:ExpressionTypes.Constant, identifier:$2}};
+
+PAYLOAD_REFERENCE
+        : DOLLAR_SYMBOL IDENT  { $$ = {expressionType:ExpressionTypes.Payload, identifier: $2 } };
+
+CONTEXT_REFERENCE
+        : CONTEXT_SYMBOL IDENT  {$$ = {expressionType:ExpressionTypes.Context, identifier:$2 } };
+
+IMMUTABLE
+        : ARRAY {$$ = { ArrayDeclaration:[], expressionType:ExpressionTypes.ArrayDeclaration} }
+        | STRING {$$ = {StringDeclaration:$1.toString(), expressionType:ExpressionTypes.StringDeclaration}}
+        | NUMBER;
+
+NUMBER
+        : INTEGER
+        {$$ = { NumberDeclaration: Number($1), expressionType: ExpressionTypes.IntegerDeclaration} }
+        | DECIMAL
+        {$$ = { NumberDeclaration: Number($1), expressionType:ExpressionTypes.DecimalDeclaration} };
