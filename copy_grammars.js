@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import path from 'node:path'
 
 function copy_grammar() {
   const grammars_input_path = path.resolve(process.cwd(), 'src/shared/grammars/');
