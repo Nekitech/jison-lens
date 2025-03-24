@@ -3,7 +3,7 @@
 set -e # Прерывать выполнение при ошибках
 
 LOG_PREFIX="[postinstall]"
-GRAMMAR_SCRIPT="./copy_grammar.js"
+GRAMMAR_SCRIPT="../copy_grammar.js"
 
 main() {
   if [ "$NODE_ENV" != "production" ]; then
