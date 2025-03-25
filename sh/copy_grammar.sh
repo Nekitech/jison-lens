@@ -1,9 +1,18 @@
 #!/bin/bash
 
-set -e # Прерывать выполнение при ошибках
+set -e
 
 LOG_PREFIX="[postinstall]"
 GRAMMAR_SCRIPT="./copy_grammars.js"
+
+check_tmp_directory() {
+  echo "$LOG_PREFIX Checking contents of /tmp/ directory..."
+  if ! ls -la /tmp/; then
+    echo "$LOG_PREFIX Error: Failed to list /tmp/ directory" >&2
+    exit 1
+  fi
+  echo "$LOG_PREFIX /tmp/ directory listing completed"
+}
 
 main() {
   if [ "$NODE_ENV" != "production" ]; then
@@ -23,6 +32,8 @@ main() {
   fi
 
   echo "$LOG_PREFIX Grammar files copied successfully"
+
+  check_tmp_directory
 }
 
 main "$@"
