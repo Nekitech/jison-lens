@@ -8,9 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    concurrency:
-      group: prod
-      cancel-in-progress: true
     steps:
       - name: SSH Command
         uses: D3rHase/ssh-command-action@v0.2.2
