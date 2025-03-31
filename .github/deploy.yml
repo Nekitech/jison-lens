@@ -20,4 +20,4 @@ jobs:
           user: ${{ secrets.PROD_SSH_USERNAME }}
           private_key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           host_fingerprint: ${{ secrets.PROD_SSH_FINGERPRINT }}
-          command: source ~/.nvm/nvm.sh; echo 'hello'
+          command: source ~/.nvm/nvm.sh; echo 'hello world'
