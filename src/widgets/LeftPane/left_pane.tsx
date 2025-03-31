@@ -27,6 +27,7 @@ import executeParsingVM from '@/shared/actions/compileJS';
 import CustomSelectGrammar from '@/features/selectGrammar/custom_select_grammar';
 import { grammars } from '@/shared/utils/grammar';
 import downloadGrammar from '@/shared/actions/downloadGrammar';
+import downloadFile from '@/shared/actions/downloadFile';
 
 const LeftPane = () => {
   const [text, setText] = useState('');
@@ -35,33 +36,8 @@ const LeftPane = () => {
   const [grammar, setGrammar] = useState('')
   const parsingDataAction = executeParsingVM.bind(null, text, grammar)
 
-  // const onCreateParser = async () => {
-  //   createParser()
-  //     .then((res) => {
-  //       if (!res.success) {
-  //         throw new Error(res.message);
-  //       }
-  //       const { success, message } = res;
-  //       if (success) {
-  //         toast({
-  //           title: 'Success',
-  //           description: message,
-  //           variant: 'default',
-  //         });
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       toast({
-  //         title: 'Error',
-  //         description: err.message,
-  //         variant: 'destructive',
-  //       });
-  //     });
-  // };
-
   useEffect(() => {
-    downloadGrammar(selected_grammar).then(grammar => {
+    downloadFile(`src/shared/grammars/${selected_grammar}`).then(grammar => {
       setGrammar(grammar)
     }).catch(err => console.log(err))
   }, [selected_grammar])
