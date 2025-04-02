@@ -18,4 +18,4 @@ jobs:
           port: ${{ secrets.PROD_SSH_PORT }}
           private_key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           host_fingerprint: ${{ secrets.PROD_SSH_FINGERPRINT }}
-          command: source ~/.nvm/nvm.sh; echo 'hello world'
+          command: source ~/.nvm/nvm.sh; ~/deploy.sh
