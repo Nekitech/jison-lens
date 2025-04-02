@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: SSH Command
-        uses: D3rHase/ssh-command-action@v0.2.2
+        uses: D3rHase/ssh-command-action@latest
         with:
           # hostname / IP of the server
           host: ${{ secrets.PROD_SSH_HOST }}
