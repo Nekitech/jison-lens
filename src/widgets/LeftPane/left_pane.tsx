@@ -23,7 +23,7 @@ import {
   MenubarTrigger,
 } from '@/shared/ui/menubar';
 import DownloadTSParser from '@/features/downloadTSParser/download_ts_parser';
-import executeParsingVM from '@/shared/actions/compileJS';
+import executeParsingInsideVMmodule from '@/shared/actions/compileJS';
 import CustomSelectGrammar from '@/features/selectGrammar/custom_select_grammar';
 import { grammars } from '@/shared/utils/grammar';
 import downloadGrammar from '@/shared/actions/downloadGrammar';
@@ -34,7 +34,7 @@ const LeftPane = () => {
   const { setData } = useParsingDataContext();
   const [selected_grammar, setSelectGrammar] = useState(() => grammars[0].name_file)
   const [grammar, setGrammar] = useState('')
-  const parsingDataAction = executeParsingVM.bind(null, text, grammar)
+  const parsingDataAction = executeParsingInsideVMmodule.bind(null, text, grammar)
 
   useEffect(() => {
     downloadFile(`src/shared/grammars/${selected_grammar}`).then(grammar => {
