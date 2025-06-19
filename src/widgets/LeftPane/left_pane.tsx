@@ -26,7 +26,6 @@ import DownloadTSParser from '@/features/downloadTSParser/download_ts_parser';
 import executeParsingVM from '@/shared/actions/compileJS';
 import CustomSelectGrammar from '@/features/selectGrammar/custom_select_grammar';
 import { grammars } from '@/shared/utils/grammar';
-import downloadGrammar from '@/shared/actions/downloadGrammar';
 import downloadFile from '@/shared/actions/downloadFile';
 
 const LeftPane = () => {

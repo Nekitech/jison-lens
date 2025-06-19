@@ -59,21 +59,25 @@ export default async function buildLexTree(data: LexNodeType | null) {
         coords: { x: number; y: number },
         level: number,
     ) => {
-        if (node?.children.length === 0) return;
-
-        const baseHorizontalSpacing = 200;
-        // Увеличиваем расстояние между узлами на каждом уровне
-        const horizontalSpacing = baseHorizontalSpacing * (level + 1);
+        if (!node?.children || node.children.length === 0) return;
 
         const verticalSpacing = 100;
+        const minSpacing = 120;
+        const maxSpacing = 280;
 
-        // Начальная позиция для первого дочернего узла
+        const len = node.children.length;
 
-        const len = node!.children.length;
+        // Вычисляем отступ в зависимости от числа детей
+        const horizontalSpacing = Math.max(
+            minSpacing,
+            Math.min(maxSpacing, 300 - 20 * len)
+        );
+
+        // Центрируем дочерние узлы
         let childX = coords.x - ((len - 1) * horizontalSpacing) / 2;
 
         for (let i = 0; i < len; i++) {
-            const nextNode = node!.children[i];
+            const nextNode = node.children[i];
 
             const newCoords = {
                 x: childX,
@@ -81,10 +85,10 @@ export default async function buildLexTree(data: LexNodeType | null) {
             };
 
             nodes.push({
-                id: nextNode?.id,
+                id: nextNode.id,
                 data: {
-                    label: nextNode?.name,
-                    description: nextNode?.output,
+                    label: nextNode.name,
+                    description: nextNode.output,
                 },
                 position: newCoords,
                 draggable: false,
@@ -92,24 +96,24 @@ export default async function buildLexTree(data: LexNodeType | null) {
                 style: {
                     width: 'auto',
                     minWidth: 80,
-                    padding: '4px 8px 4px 8px',
+                    padding: '4px 8px',
                     borderRadius: '5px',
                     whiteSpace: 'nowrap',
                 },
             });
 
             edges.push({
-                id: `${node?.id} -> ${nextNode?.id}`,
-                source: node?.id,
-                target: nextNode?.id,
+                id: `${node.id} -> ${nextNode.id}`,
+                source: node.id,
+                target: nextNode.id,
             });
 
             recursive(nextNode, newCoords, level + 1);
 
-            // Сдвигаем позицию для следующего дочернего узла
             childX += horizontalSpacing;
         }
     };
+
 
     addUniqueIds(data);
 

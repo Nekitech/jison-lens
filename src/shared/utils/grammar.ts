@@ -23,5 +23,9 @@ export const grammars: TGrammarItem[] = [
   {
     name_file: 'chords.jison',
     text_grammar: 'Музыкальные аккорды'
+  },
+  {
+    name_file: 'yantrix.jison',
+    text_grammar: 'Грамматика Yantrix'
   }
 ]
